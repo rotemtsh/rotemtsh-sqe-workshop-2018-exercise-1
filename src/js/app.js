@@ -1,19 +1,22 @@
 import $ from 'jquery';
 import {parseCode} from './code-analyzer';
 
-$(document).ready(function () {
-    $('#codeSubmissionButton').click(() => {
-        let codeToParse = $('#codePlaceholder').val();
-        let parsedCode = parseCode(codeToParse);
-        makeRow(parsedCode)
-        $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
-    });
-});
-
-
 const tableStruct = (...keys) => ((...v) => keys.reduce((o, k, i) => {o[k] = v[i]; return o;} , {}));
 const rowItem = tableStruct('Line', 'Type', 'Name', 'Condition', 'Value');
 var myRows = [];
+
+$(document).ready(function () {
+    $('#codeSubmissionButton').click(() => {
+
+        let codeToParse = $('#codePlaceholder').val();
+        let parsedCode = parseCode(codeToParse);
+        makeRow(parsedCode);
+        showTable();
+        $('#parsedCode').val(JSON.stringify(parsedCode, null, 2));
+        myRows = [];
+    });
+});
+
 
 function makeRow(parsedCode){
     switch(parsedCode['type']) {
@@ -35,10 +38,10 @@ function makeRow(parsedCode){
         }
         break;
     case 'ExpressionStatement':
-        value = parsedCode['right'];
+        value = parsedCode['expression']['right'];
         if(value != null)
             value = makeRow(value);
-        myRows.push(rowItem(parsedCode['loc']['start']['line'], 'assignment expression', parsedCode['left']['name'], '', value));
+        myRows.push(rowItem(parsedCode['loc']['start']['line'], 'assignment expression', parsedCode['expression']['left']['name'], '', value));
         break;
     case 'Identifier':
         return parsedCode['name'];
@@ -63,15 +66,34 @@ function makeRow(parsedCode){
         if(test != null)
             test = makeRow(test);
         myRows.push(rowItem(parsedCode['loc']['start']['line'], 'if statement', '', test, ''));
-        for (i = 0; i < parsedCode['consequent']['body']['length']; i++) {
-            makeRow(parsedCode['consequent']['body'][i]);
-        }
-        break;
-    case 'else if statement':
+        makeRow(parsedCode['consequent']);
+        if(parsedCode['alternate']!=null)
+            if(parsedCode['alternate']['type']=== 'IfStatement')
+                elseif(parsedCode['alternate']);
+            else  makeRow(parsedCode['alternate']);
         break;
     case 'ReturnStatement':
+        value = parsedCode['argument'];
+        if(value != null)
+            value = makeRow(value);
+        myRows.push(rowItem(parsedCode['loc']['start']['line'], 'return statement', '', '', value));
         break;
+    case 'UnaryExpression':
+        value = parsedCode['argument'];
+        if(value != null)
+            value = makeRow(value);
+        if(parsedCode['prefix'])
+            return parsedCode['operator'] + '' + value;
+        else return value;
+    case 'MemberExpression':
+        value = parsedCode['object'];
+        if(value != null)
+            value = makeRow(value);
+        var property = makeRow(parsedCode['property']);
+        return '' + value +'[' + property +']';
     }
+
+
 }
 
 function functionDec(parsedCode)
@@ -91,4 +113,32 @@ function functionDec(parsedCode)
 function insertParams(parsedCodeParam)
 {
     myRows.push(rowItem(parsedCodeParam['loc']['start']['line'], 'variable declaration', parsedCodeParam['name'],'','' ));
+}
+
+function elseif(parsedCode)
+{
+    var test = parsedCode['test'];
+    if(test != null)
+        test = makeRow(test);
+    myRows.push(rowItem(parsedCode['loc']['start']['line'], 'else if statement', '', test, ''));
+    makeRow(parsedCode['consequent']);
+    if(parsedCode['alternate']!=null)
+        if(parsedCode['alternate']['type'] === 'IfStatement')
+            elseif(parsedCode['alternate']);
+        else  makeRow(parsedCode['alternate']);
+}
+
+function showTable()
+{
+    var table = document.getElementById('outputTable');
+    table.style= 'visibility: visible;width: 80%;';
+    var i;
+    for (i = 0; i < myRows.length; i++) {
+        var row = table.insertRow();
+        row.insertCell(0).innerHTML= myRows[i].Line;
+        row.insertCell(1).innerHTML = myRows[i]['Type'];
+        row.insertCell(2).innerHTML = myRows[i].Name;
+        row.insertCell(3).innerHTML = myRows[i]['Condition'];
+        row.insertCell(4).innerHTML = myRows[i]['Value'];
+    }
 }
