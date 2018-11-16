@@ -25,10 +25,10 @@ describe('The javascript parser for assignment', () => {
 describe('The javascript parser for conditions', () => {
     it('is parsing a if statement correctly', () => {
         clearMyRows();
-        makeRow(parseCode('if(a < b)\n' + 'a=1;'));
+        makeRow(parseCode('if(a < b)\n' + 'a++;'));
         var rows = [];
         rows.push(rowItem(1, 'if statement', '', 'a < b', ''));
-        rows.push(rowItem(2, 'assignment expression', 'a', '', 1));
+        rows.push(rowItem(2, 'assignment expression', 'a', '', 'a++'));
         assert.equal(JSON.stringify(myRows), JSON.stringify(rows));});
     it('is parsing a else if correctly', () => {
         clearMyRows();

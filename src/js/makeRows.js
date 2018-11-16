@@ -184,13 +184,13 @@ function declarationReturn(parsedCode){
     var name = parsedCode['id'];
     if(name != null)
         name = returnFunctions[name.type](name);
+    var ret = '' + name;
     var value = parsedCode['init'];
     if(value != null) {
         value = returnFunctions[value.type](value);
-        return '' + name + '=' + value;
+        ret +=  '=' + value;
     }
-    else
-        return name;
+    return ret;
 }
 
 /**
