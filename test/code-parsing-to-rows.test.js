@@ -41,7 +41,27 @@ describe('The javascript parser for conditions', () => {
         rows.push(rowItem(2, 'assignment expression', 'a', '', 1));
         rows.push(rowItem(3, 'else if statement', '', 'a == b', ''));
         rows.push(rowItem(4, 'assignment expression', 'a', '', 2));
-        assert.equal(JSON.stringify(myRows), JSON.stringify(rows));});});
+        assert.equal(JSON.stringify(myRows), JSON.stringify(rows));});
+    it('is parsing a else correctly', () => {
+        clearMyRows();
+        makeRow(parseCode('if(a > b)\na=1\nelse\nb=1'));
+        var rows = [];
+        rows.push(rowItem(1, 'if statement', '', 'a > b', ''));
+        rows.push(rowItem(2, 'assignment expression', 'a', '', 1));
+        rows.push(rowItem(4, 'assignment expression', 'b', '', 1));
+        assert.equal(JSON.stringify(myRows), JSON.stringify(rows));});
+    it('is parsing a else if in else if correctly', () => {
+        clearMyRows();
+        makeRow(parseCode('if(a > b)\na=1\nelse if(a==b)\nb=1\nelse if(a>c)\nc=1'));
+        var rows = [];
+        rows.push(rowItem(1, 'if statement', '', 'a > b', ''));
+        rows.push(rowItem(2, 'assignment expression', 'a', '', 1));
+        rows.push(rowItem(3, 'else if statement', '', 'a == b', ''));
+        rows.push(rowItem(4, 'assignment expression', 'b', '', 1));
+        rows.push(rowItem(5, 'else if statement', '', 'a > c', ''));
+        rows.push(rowItem(6, 'assignment expression', 'c', '', 1));
+        assert.equal(JSON.stringify(myRows), JSON.stringify(rows));});
+});
 
 describe('The javascript parser for loops', () => {
     it('is parsing a while statement correctly', () => {

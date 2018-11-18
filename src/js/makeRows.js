@@ -52,8 +52,6 @@ function declaration(parsedCode){
     if(name != null)
         name = returnFunctions[name.type](name);
     var value = parsedCode['init'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'variable declaration', name, '', value));
 }
 
@@ -147,9 +145,7 @@ function UnaryParsing(parsedCode){
     var value = parsedCode['argument'];
     if(value != null)
         value = returnFunctions[value.type](value);
-    if(parsedCode['prefix'])
-        return parsedCode['operator'] + '' + value;
-    else return value;
+    return parsedCode['operator'] + '' + value;
 }
 
 /**
