@@ -167,10 +167,8 @@ function declarationReturn(parsedCode){
     name = returnFunctions[name.type](name);
     var ret = '' + name;
     var value = parsedCode['init'];
-    if(value != null) {
-        value = returnFunctions[value.type](value);
-        ret +=  '=' + value;
-    }
+    value = returnFunctions[value.type](value);
+    ret +=  '=' + value;
     return ret;
 }
 
