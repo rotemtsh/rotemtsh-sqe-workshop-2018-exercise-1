@@ -29,8 +29,7 @@ const returnFunctions = {
 
 
 function makeRow(parsedCode){
-    if (parsedCode.type in pushFunctions)
-        pushFunctions[parsedCode.type](parsedCode);
+    pushFunctions[parsedCode.type](parsedCode);
 }
 
 function ProgramParsing(parsedCode){
@@ -49,8 +48,7 @@ function VariableParsing(parsedCode){
 
 function declaration(parsedCode){
     var name = parsedCode['id'];
-    if(name != null)
-        name = returnFunctions[name.type](name);
+    name = returnFunctions[name.type](name);
     var value = parsedCode['init'];
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'variable declaration', name, '', value));
 }
@@ -58,7 +56,7 @@ function declaration(parsedCode){
 function ExpressionParsing(parsedCode){
     if(parsedCode['expression']['type'] === 'AssignmentExpression')
         AssignmentParsing(parsedCode['expression']);
-    else if (parsedCode['expression']['type'] === 'UpdateExpression'){
+    else {
         var name = returnFunctions[parsedCode['expression']['argument'].type](parsedCode['expression']['argument']);
         var ret = UpdateParsing(parsedCode['expression']);
         myRows.push(rowItem(parsedCode['loc']['start']['line'], 'assignment expression', name, '', ret));
@@ -67,40 +65,33 @@ function ExpressionParsing(parsedCode){
 
 function AssignmentParsing(parsedCode){
     var left = parsedCode['left'];
-    if(left != null)
-        left = returnFunctions[left.type](left);
+    left = returnFunctions[left.type](left);
     var value = parsedCode['right'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
+    value = returnFunctions[value.type](value);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'assignment expression', left, '', value));
 }
 
 function WhileParsing(parsedCode){
     var test = parsedCode['test'];
-    if(test != null)
-        test = returnFunctions[test.type](test);
+    test = returnFunctions[test.type](test);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'while statement', '', test, ''));
     makeRow(parsedCode['body']);
 }
 
 function ForParsing(parsedCode){
     var init = parsedCode['init'];
-    if(init != null)
-        init = returnFunctions[init.type](init);
+    init = returnFunctions[init.type](init);
     var test = parsedCode['test'];
-    if(test != null)
-        test = returnFunctions[test.type](test);
+    test = returnFunctions[test.type](test);
     var update = parsedCode['update'];
-    if(update != null)
-        update = returnFunctions[update.type](update);
+    update = returnFunctions[update.type](update);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'for statement', '', init +';' + test + ';' + update, ''));
     makeRow(parsedCode['body']);
 }
 
 function IfParsing(parsedCode){
     var test = parsedCode['test'];
-    if(test != null)
-        test = returnFunctions[test.type](test);
+    test = returnFunctions[test.type](test);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'if statement', '', test, ''));
     makeRow(parsedCode['consequent']);
     if(parsedCode['alternate']!=null)
@@ -115,8 +106,7 @@ function BlockParsing(parsedCode){
 
 function ReturnParsing(parsedCode){
     var value = parsedCode['argument'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
+    value = returnFunctions[value.type](value);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'return statement', '', '', value));
 }
 
@@ -143,8 +133,7 @@ function LiteralParsing(parsedCode){
  */
 function UnaryParsing(parsedCode){
     var value = parsedCode['argument'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
+    value = returnFunctions[value.type](value);
     return parsedCode['operator'] + '' + value;
 }
 
@@ -153,8 +142,7 @@ function UnaryParsing(parsedCode){
  */
 function MemberParsing(parsedCode){
     var value = parsedCode['object'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
+    value = returnFunctions[value.type](value);
     var property = returnFunctions[parsedCode['property'].type](parsedCode['property']);
     return '' + value +'[' + property +']';
 }
@@ -164,11 +152,9 @@ function MemberParsing(parsedCode){
  */
 function AssignmentReturnParsing(parsedCode){
     var left = parsedCode['left'];
-    if(left != null)
-        left = returnFunctions[left.type](left);
+    left = returnFunctions[left.type](left);
     var value = parsedCode['right'];
-    if(value != null)
-        value = returnFunctions[value.type](value);
+    value = returnFunctions[value.type](value);
     return '' + left +parsedCode['operator']+value;
 }
 
@@ -178,8 +164,7 @@ function VariableReturnParsing(parsedCode){
 
 function declarationReturn(parsedCode){
     var name = parsedCode['id'];
-    if(name != null)
-        name = returnFunctions[name.type](name);
+    name = returnFunctions[name.type](name);
     var ret = '' + name;
     var value = parsedCode['init'];
     if(value != null) {
@@ -194,8 +179,7 @@ function declarationReturn(parsedCode){
  */
 function UpdateParsing(parsedCode){
     var arg = parsedCode['argument'];
-    if(arg != null)
-        arg = returnFunctions[arg.type](arg);
+    arg = returnFunctions[arg.type](arg);
     if(parsedCode['prefix'])
         return '' + parsedCode['operator'] + arg;
     else
@@ -210,8 +194,7 @@ function insertParams(parsedCodeParam)
 function elseif(parsedCode)
 {
     var test = parsedCode['test'];
-    if(test != null)
-        test = returnFunctions[test.type](test);
+    test = returnFunctions[test.type](test);
     myRows.push(rowItem(parsedCode['loc']['start']['line'], 'else if statement', '', test, ''));
     makeRow(parsedCode['consequent']);
     if(parsedCode['alternate']!=null)
